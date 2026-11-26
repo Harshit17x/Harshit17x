@@ -3,9 +3,6 @@ import { loadConfig } from './lib/config.mjs';
 import { loadGithubData } from './lib/github.mjs';
 import { renderReadme } from './lib/readme.mjs';
 import { headerSvg } from './lib/cards/header.mjs';
-import { projectSvg, moreReposSvg, linkSvg } from './lib/cards/repos.mjs';
-import { activitySvg } from './lib/cards/activity.mjs';
-import { stackSvg } from './lib/cards/stack.mjs';
 
 const root = new URL('../', import.meta.url);
 const config = await loadConfig(new URL('profile.config.json', root));
@@ -16,19 +13,7 @@ const { profile } = config;
 // README layout: each inner array is one line of cards.
 const layout = [
   [{ name: 'header', alt: `${profile.name}: ${profile.intro}`, href: `https://github.com/${config.github.username}`, render: (c, m) => headerSvg(c, m, data) }],
-  data.featured.map((repo, i) => ({
-    name: `project-${i + 1}`,
-    alt: `${repo.name}: ${repo.description || 'project'}`,
-    href: repo.homepage || repo.url,
-    render: (c, m) => projectSvg(c, m, data, i),
-  })),
-  data.more.length
-    ? [{ name: 'repos', alt: `More repositories: ${data.more.map((r) => r.name).join(', ')}`, href: `https://github.com/${config.github.username}?tab=repositories`, render: (c, m) => moreReposSvg(c, m, data) }]
-    : [],
-  [{ name: 'activity', alt: `${data.totals.contributions} contributions in the last year`, render: (c, m) => activitySvg(c, m, data) }],
-  [{ name: 'stack', alt: `Stack: ${Object.values(config.stack).flat().join(', ')}`, render: stackSvg }],
-  config.links.map((link, i) => ({ name: `link-${i + 1}`, alt: link.label, href: link.url, render: (c, m) => linkSvg(c, m, i) })),
-].filter((row) => row.length);
+];
 
 const rows = [];
 const written = [];
