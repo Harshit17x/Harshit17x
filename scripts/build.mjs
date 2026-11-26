@@ -59,9 +59,11 @@ for (const f of await readdir(new URL('generated/', root))) {
 }
 
 // Local-only preview (gitignored): the README's cards on GitHub's dark and light page colours, at README width.
+// The ?v= stamp stops the browser showing cached cards from an earlier build.
+const stamp = Date.now();
 const column = (mode, bg) => `<section style="background:${bg};padding:24px 16px"><div style="max-width:880px;margin:auto">${rows
   .map((row) => `<div style="display:flex;justify-content:center;margin-bottom:8px">${row
-    .map((c) => `<img src="generated/${c.name}-${mode}.svg" style="width:${100 / row.length}%;display:block" alt="">`)
+    .map((c) => `<img src="generated/${c.name}-${mode}.svg?v=${stamp}" style="width:${100 / row.length}%;display:block" alt="">`)
     .join('')}</div>`)
   .join('')}</div></section>`;
 await writeFile(
