@@ -7,11 +7,12 @@ export const THUMB = { w: 100, h: 40 }; // project thumbnails, in dither cells
 
 const QUERY = `query($login: String!) {
   user(login: $login) {
+    followers { totalCount }
     repositories(ownerAffiliations: OWNER, isFork: false, privacy: PUBLIC, first: 100,
                  orderBy: { field: STARGAZERS, direction: DESC }) {
       totalCount
       nodes {
-        name description url stargazerCount openGraphImageUrl usesCustomOpenGraphImage
+        name description url homepageUrl pushedAt stargazerCount openGraphImageUrl usesCustomOpenGraphImage
         primaryLanguage { name }
         languages(first: 10, orderBy: { field: SIZE, direction: DESC }) { edges { size node { name } } }
       }
@@ -63,7 +64,9 @@ async function thumbnail(url) {
   }
 }
 
-export async function summarise(user, featuredConfig) {
+const shortDate = (iso) => (iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) : '');
+
+export async function summarise(user, featuredConfig, moreConfig = []) {
   const repos = user.repositories.nodes;
   const sizes = new Map();
   for (const r of repos) for (const e of r.languages.edges) sizes.set(e.node.name, (sizes.get(e.node.name) ?? 0) + e.size);
@@ -73,24 +76,40 @@ export async function summarise(user, featuredConfig) {
     .slice(0, 5)
     .map(([name, size]) => ({ name, share: size / totalSize }));
 
+  const find = (name) => {
+    const repo = repos.find((r) => r.name.toLowerCase() === name.toLowerCase());
+    if (!repo) throw new Error(`featured repo "${name}" is not among your public, non-fork repos: ${repos.map((r) => r.name).join(', ')}`);
+    return repo;
+  };
+  const brief = (repo, description) => ({
+    name: repo.name,
+    description: description || repo.description || '',
+    url: repo.url,
+    stars: repo.stargazerCount,
+    language: repo.primaryLanguage?.name ?? '',
+  });
+
   const featured = [];
   for (const f of featuredConfig) {
-    const repo = repos.find((r) => r.name.toLowerCase() === f.repo.toLowerCase());
-    if (!repo) throw new Error(`featured repo "${f.repo}" is not among your public, non-fork repos: ${repos.map((r) => r.name).join(', ')}`);
+    const repo = find(f.repo);
     featured.push({
-      name: repo.name,
-      description: f.description || repo.description || '',
-      url: repo.url,
-      stars: repo.stargazerCount,
-      language: repo.primaryLanguage?.name ?? '',
+      ...brief(repo, f.description),
+      homepage: repo.homepageUrl || '',
+      updated: shortDate(repo.pushedAt),
       // GitHub's auto-generated card is mostly text and turns to mush when dithered; only use custom previews.
       thumb: repo.usesCustomOpenGraphImage ? await thumbnail(repo.openGraphImageUrl) : null,
     });
   }
 
+  const taken = new Set(featured.map((f) => f.name));
+  const more = moreConfig.length
+    ? moreConfig.map((name) => brief(find(name)))
+    : repos.filter((r) => !taken.has(r.name) && r.name.toLowerCase() !== user.login?.toLowerCase()).slice(0, 3).map((r) => brief(r));
+
   const cal = user.contributionsCollection.contributionCalendar;
   return {
     totals: {
+      followers: user.followers.totalCount,
       contributions: cal.totalContributions,
       repos: user.repositories.totalCount,
       stars: repos.reduce((a, r) => a + r.stargazerCount, 0),
@@ -103,6 +122,7 @@ export async function summarise(user, featuredConfig) {
     }),
     languages,
     featured,
+    more,
   };
 }
 
@@ -111,7 +131,7 @@ export async function loadGithubData(config, cacheUrl) {
   if (tok) {
     try {
       const user = await graphql(tok, { login: config.github.username });
-      const data = await summarise(user, config.github.featuredRepos);
+      const data = await summarise({ ...user, login: config.github.username }, config.github.featuredRepos, config.github.moreRepos ?? []);
       await mkdir(new URL('./', cacheUrl), { recursive: true });
       await writeFile(cacheUrl, `${JSON.stringify(data, null, 1)}\n`);
       return data;

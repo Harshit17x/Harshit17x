@@ -3,7 +3,7 @@ import { readdir, readFile, access } from 'node:fs/promises';
 import { XMLValidator } from 'fast-xml-parser';
 
 const root = new URL('../', import.meta.url);
-const BUDGET_KB = { hero: 900, default: 300 };
+const BUDGET_KB = { header: 900, default: 300 };
 const problems = [];
 
 const files = (await readdir(new URL('generated/', root))).filter((f) => f.endsWith('.svg'));
@@ -14,7 +14,7 @@ for (const f of files) {
   const valid = XMLValidator.validate(text);
   if (valid !== true) problems.push(`${f}: invalid XML (${valid.err.msg} at line ${valid.err.line})`);
   const kb = Buffer.byteLength(text) / 1024;
-  const budget = f.startsWith('hero') ? BUDGET_KB.hero : BUDGET_KB.default;
+  const budget = f.startsWith('header') ? BUDGET_KB.header : BUDGET_KB.default;
   if (kb > budget) problems.push(`${f}: ${kb.toFixed(0)} KB is over the ${budget} KB budget`);
   // GitHub's image sandbox blocks external loads, so anything not inline or a local #id would break.
   for (const m of text.matchAll(/(?:href|src)\s*=\s*"([^"]*)"|url\(\s*['"]?([^'")]*)/g)) {

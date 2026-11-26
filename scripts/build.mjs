@@ -1,11 +1,11 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, unlink, writeFile } from 'node:fs/promises';
 import { loadConfig } from './lib/config.mjs';
 import { loadGithubData } from './lib/github.mjs';
 import { renderReadme } from './lib/readme.mjs';
-import { heroSvg } from './lib/cards/hero.mjs';
-import { introSvg, nowSvg, stackSvg, linkSvg } from './lib/cards/static.mjs';
-import { signalSvg, projectSvg } from './lib/cards/data.mjs';
-import { footerSvg } from './lib/cards/footer.mjs';
+import { headerSvg } from './lib/cards/header.mjs';
+import { projectSvg, moreReposSvg, linkSvg } from './lib/cards/repos.mjs';
+import { activitySvg } from './lib/cards/activity.mjs';
+import { stackSvg } from './lib/cards/stack.mjs';
 
 const root = new URL('../', import.meta.url);
 const config = await loadConfig(new URL('profile.config.json', root));
@@ -15,20 +15,20 @@ await mkdir(new URL('generated/', root), { recursive: true });
 const { profile } = config;
 // README layout: each inner array is one line of cards.
 const layout = [
-  [{ name: 'hero', alt: `${profile.name}: ${profile.role}. ${profile.taglines[0]}`, render: heroSvg }],
-  [{ name: 'intro', alt: profile.intro.join(' '), render: introSvg }],
-  [{ name: 'now', alt: Object.entries(profile.now).map(([k, v]) => `${k}: ${v}`).join(', '), render: nowSvg }],
+  [{ name: 'header', alt: `${profile.name}: ${profile.intro}`, href: `https://github.com/${config.github.username}`, render: (c, m) => headerSvg(c, m, data) }],
   data.featured.map((repo, i) => ({
     name: `project-${i + 1}`,
     alt: `${repo.name}: ${repo.description || 'project'}`,
-    href: repo.url,
+    href: repo.homepage || repo.url,
     render: (c, m) => projectSvg(c, m, data, i),
   })),
-  [{ name: 'signal', alt: `${data.totals.contributions} contributions in the last year`, render: (c, m) => signalSvg(c, m, data) }],
-  [{ name: 'stack', alt: `Stack: ${config.stack.map((s) => s.label).join(', ')}`, render: stackSvg }],
-  [{ name: 'footer', alt: profile.signoff ?? 'see you around', render: footerSvg }],
+  data.more.length
+    ? [{ name: 'repos', alt: `More repositories: ${data.more.map((r) => r.name).join(', ')}`, href: `https://github.com/${config.github.username}?tab=repositories`, render: (c, m) => moreReposSvg(c, m, data) }]
+    : [],
+  [{ name: 'activity', alt: `${data.totals.contributions} contributions in the last year`, render: (c, m) => activitySvg(c, m, data) }],
+  [{ name: 'stack', alt: `Stack: ${Object.values(config.stack).flat().join(', ')}`, render: stackSvg }],
   config.links.map((link, i) => ({ name: `link-${i + 1}`, alt: link.label, href: link.url, render: (c, m) => linkSvg(c, m, i) })),
-];
+].filter((row) => row.length);
 
 const rows = [];
 const written = [];
@@ -49,6 +49,14 @@ for (const row of layout) {
 }
 await writeFile(new URL('README.md', root), renderReadme(rows));
 console.log('README.md written');
+
+// Remove cards from earlier layouts so generated/ only holds what the README uses.
+for (const f of await readdir(new URL('generated/', root))) {
+  if (f.endsWith('.svg') && !written.includes(`generated/${f}`)) {
+    await unlink(new URL(`generated/${f}`, root));
+    console.log(`removed stale generated/${f}`);
+  }
+}
 
 // Local-only preview (gitignored): the README's cards on GitHub's dark and light page colours, at README width.
 const column = (mode, bg) => `<section style="background:${bg};padding:24px 16px"><div style="max-width:880px;margin:auto">${rows

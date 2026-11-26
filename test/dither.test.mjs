@@ -47,13 +47,19 @@ test('fbm tiles horizontally so drifting clouds loop without a seam', () => {
 
 test('config validation names every missing or malformed field', () => {
   assert.throws(() => validateConfig({}), /missing github\.username[\s\S]*missing theme\.light/);
-  const theme = { bg: '#000000', ink: '#ffffff', dim: 'grey', accent: '#ffd400', ramp: ['#000000', '#777777', '#ffffff'] };
+  const c = '#101010';
+  const theme = {
+    page: c, panel: c, well: c, line: c, text1: c, text2: c, text3: 'grey', accent: c, onAccent: c,
+    ramp: [c, c, c, c, c, c], accentSteps: 9,
+  };
   assert.throws(
     () => validateConfig({
-      github: { username: 'u' },
-      profile: { name: 'n', role: 'r', status: 's', taglines: ['t'], motto: ['one'] },
+      github: { username: 'u', featuredRepos: [{ repo: 'a' }] },
+      profile: { name: 'n', intro: 'i', now: 'n', mark: 'm', status: 's', focus: 'f' },
+      links: [{ label: 'x', url: 'ftp://nope' }],
+      stack: { tools: [] },
       theme: { dark: theme, light: theme },
     }),
-    /theme\.dark\.dim must be a #rrggbb colour[\s\S]*motto must have exactly 2 words/,
+    /theme\.dark\.text3 must be a #rrggbb colour[\s\S]*accentSteps[\s\S]*featuredRepos must list exactly 2[\s\S]*links\[0\]\.url[\s\S]*stack\["tools"\]/,
   );
 });

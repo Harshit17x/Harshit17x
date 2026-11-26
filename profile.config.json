@@ -4,29 +4,16 @@
     "featuredRepos": [
       { "repo": "Diskatlas" },
       { "repo": "Nitro-Drift", "description": "" }
-    ]
+    ],
+    "moreRepos": []
   },
   "profile": {
     "name": "harshit",
-    "role": "developer",
-    "status": "building",
-    "taglines": [
-      "building small, strange, useful software",
-      "currently: pixels, dithering and the web",
-      "open to interesting problems"
-    ],
-    "motto": ["stay", "curious"],
-    "intro": [
-      "I build local-first tools and small games.",
-      "Lately: pixels, dithering and quiet, fast software."
-    ],
-    "now": {
-      "now": "shipping Diskatlas",
-      "building": "tools and games",
-      "learning": "graphics and shaders",
-      "based in": "earth, mostly"
-    },
-    "signoff": "see you around"
+    "intro": "Developer building local-first tools and small games.",
+    "now": "shipping Diskatlas",
+    "mark": "building",
+    "status": "active",
+    "focus": "tools"
   },
   "links": [
     { "label": "github", "url": "https://github.com/Harshit17x" },
@@ -34,29 +21,32 @@
     { "label": "email", "url": "mailto:you@example.com" },
     { "label": "website", "url": "https://example.com" }
   ],
-  "stack": [
-    { "label": "TypeScript", "mono": "TS" },
-    { "label": "JavaScript", "mono": "JS" },
-    { "label": "C#", "mono": "C#" },
-    { "label": "HTML", "mono": "HT" },
-    { "label": "CSS", "mono": "CS" },
-    { "label": "Git", "mono": "GT" }
-  ],
+  "stack": {
+    "languages": ["typescript", "javascript", "C#", "python", "html5", "css"],
+    "frontend": ["react", "nextdotjs", "tailwindcss", "vite"],
+    "games / graphics": ["unity", "threedotjs", "blender"],
+    "tools": ["git", "githubactions", "nodedotjs", "docker", "vercel", "claude"]
+  },
   "theme": {
     "dark": {
-      "bg": "#0b0a07", "ink": "#f6ecc9", "dim": "#9a8a5c", "accent": "#ffd400",
-      "ramp": ["#0b0a07", "#1d180b", "#3a2f0d", "#6e5a06", "#b08e00", "#e6bb00", "#ffd400", "#fff0a0"]
+      "page": "#111111", "panel": "#161616", "well": "#202020", "line": "#2c2c2c",
+      "text1": "#f2f2f2", "text2": "#bdbdbd", "text3": "#8a8a8a",
+      "accent": "#ff7a2f", "onAccent": "#140a04",
+      "ramp": ["#161616", "#1d1d1d", "#262626", "#333333", "#444444", "#585858", "#7a3412", "#b44d18", "#ff7a2f", "#ffb07a"],
+      "accentSteps": 4
     },
     "light": {
-      "bg": "#f5f1e6", "ink": "#2a2208", "dim": "#7d6f45", "accent": "#a88400",
-      "ramp": ["#f5f1e6", "#efe5c2", "#e5d38e", "#d9bd52", "#c49f12", "#9a7b00", "#6b5500", "#3a2e00"]
+      "page": "#f4f4f2", "panel": "#ffffff", "well": "#efefec", "line": "#dcdcd7",
+      "text1": "#161616", "text2": "#444444", "text3": "#767676",
+      "accent": "#e2621a", "onAccent": "#ffffff",
+      "ramp": ["#ffffff", "#f2f2ef", "#e6e6e2", "#d6d6d1", "#c2c2bc", "#aaaaa3", "#f6c3a0", "#ef9a63", "#e2621a", "#b84a0e"],
+      "accentSteps": 4
     }
   },
   "effects": {
     "seed": 7
   },
   "motion": {
-    "driftSeconds": 90,
-    "scanSeconds": 8
+    "bandSeconds": 120
   }
 }
