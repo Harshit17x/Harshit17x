@@ -1,7 +1,7 @@
 {
  "totals": {
   "followers": 6,
-  "contributions": 390,
+  "contributions": 391,
   "repos": 18,
   "stars": 4
  },
@@ -479,7 +479,7 @@
    5,
    7,
    12,
-   16,
+   17,
    null,
    null
   ]
@@ -508,47 +508,63 @@
  ],
  "featured": [
   {
+   "name": "harshit-owc26",
+   "description": "my portfolio, a garden of files",
+   "url": "https://github.com/Harshit17x/harshit-owc26",
+   "stars": 0,
+   "language": "TypeScript",
+   "homepage": "https://harshit-owc26.vercel.app",
+   "updated": "Nov 14"
+  },
+  {
+   "name": "Slop-Drift",
+   "description": "drift a rally hatch up mussoorie",
+   "url": "https://github.com/Harshit17x/Slop-Drift",
+   "stars": 0,
+   "language": "JavaScript",
+   "homepage": "https://slop-drift.vercel.app",
+   "updated": "Nov 26"
+  },
+  {
+   "name": "Mafiaaaaaakhelo",
+   "description": "midnight city mafia, 5-16 players",
+   "url": "https://github.com/Harshit17x/Mafiaaaaaakhelo",
+   "stars": 0,
+   "language": "TypeScript",
+   "homepage": "https://mafiaaaaaa.vercel.app",
+   "updated": "Nov 16"
+  },
+  {
+   "name": "Saanjh",
+   "description": "shared medicine care for elders",
+   "url": "https://github.com/Harshit17x/Saanjh",
+   "stars": 0,
+   "language": "TypeScript",
+   "homepage": "",
+   "updated": "Nov 22"
+  }
+ ],
+ "more": [
+  {
    "name": "Diskatlas",
    "description": "Local-first,  disk space analyzer and developer storage cleaner for macOS, Windows, and Linux. ",
    "url": "https://github.com/Harshit17x/Diskatlas",
    "stars": 2,
-   "language": "TypeScript",
-   "homepage": "https://github.com/Harshit17x/Diskatlas",
-   "updated": "Nov 9",
-   "thumb": null
+   "language": "TypeScript"
   },
   {
    "name": "Nitro-Drift",
    "description": "",
    "url": "https://github.com/Harshit17x/Nitro-Drift",
    "stars": 2,
-   "language": "C#",
-   "homepage": "",
-   "updated": "Nov 4",
-   "thumb": null
-  }
- ],
- "more": [
-  {
-   "name": "Saanjh",
-   "description": "",
-   "url": "https://github.com/Harshit17x/Saanjh",
-   "stars": 0,
-   "language": "TypeScript"
+   "language": "C#"
   },
   {
-   "name": "Mafiaaaaaakhelo",
+   "name": "Fun-GraphicsCardModel",
    "description": "",
-   "url": "https://github.com/Harshit17x/Mafiaaaaaakhelo",
+   "url": "https://github.com/Harshit17x/Fun-GraphicsCardModel",
    "stars": 0,
-   "language": "TypeScript"
-  },
-  {
-   "name": "harshit-owc26",
-   "description": "",
-   "url": "https://github.com/Harshit17x/harshit-owc26",
-   "stars": 0,
-   "language": "TypeScript"
+   "language": "JavaScript"
   }
  ]
 }

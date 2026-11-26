@@ -1,86 +1,45 @@
-// Featured project cards (two side by side) and the "more repositories" table.
-import { bayerLevels } from '../dither.mjs';
-import { fbm, mulberry32 } from '../noise.mjs';
-import { indexedPng, hexToRgba } from '../raster.mjs';
-import { THUMB } from '../github.mjs';
-import {
-  PX, clamp01, textKit, svgDoc, pxImage, frame, hline, vline, cell, titleBar, BAR, measurer, wrapWidth, truncate, arrow,
-} from '../svg.mjs';
+// Project showcase cards (a 2-wide grid of real UI screenshots), the "more repositories" table and link cells.
+import { readFile } from 'node:fs/promises';
+import { textKit, svgDoc, frame, hline, BAR, measurer, truncate } from '../svg.mjs';
 
 const fmt = (n) => n.toLocaleString('en-US');
-const hashName = (s) => [...s].reduce((h, ch) => (Math.imul(h, 31) + ch.charCodeAt(0)) >>> 0, 7);
+const root = new URL('../../../', import.meta.url);
+const host = (url) => url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
-// Preview art, as ramp indexes. A custom social preview is dithered in greys only; otherwise each repo gets
-// its own quiet scene: a grey dithered ridge with a trail of ember dots rising across it.
-function previewIndices(theme, repo, mode) {
-  const levels = theme.ramp.length;
-  const greys = levels - theme.accentSteps;
-  const n = THUMB.w * THUMB.h;
-  const idx = new Uint8Array(n);
-  if (repo.thumb) {
-    const gray = Buffer.from(repo.thumb, 'base64');
-    // Ramp index rises toward light greys in dark mode and toward dark greys in light mode.
-    const dark = mode === 'dark';
-    const values = Float32Array.from({ length: n }, (_, i) => (dark ? gray[i] : 255 - gray[i]) / 255);
-    return bayerLevels(values, THUMB.w, THUMB.h, greys);
-  }
-  const seed = hashName(repo.name);
-  const opts = { tileWidth: THUMB.w, features: 3, octaves: 4, seed };
-  const ridge = (x) => THUMB.h * (0.5 + 0.35 * (fbm(x, 0.5, opts) - 0.5) * 2.5);
-  const values = new Float32Array(n);
-  for (let x = 0; x < THUMB.w; x++) {
-    const top = ridge(x);
-    for (let y = 0; y < THUMB.h; y++) {
-      const below = y - top;
-      values[y * THUMB.w + x] = below < 0 ? 0 : clamp01(0.55 - below / THUMB.h) * (0.6 + 0.4 * fbm(x, y * 2, { ...opts, seed: seed + 1 }));
-    }
-  }
-  idx.set(bayerLevels(values, THUMB.w, THUMB.h, greys));
-  const rand = mulberry32(seed);
-  for (let x = 4; x < THUMB.w; x += 7 + Math.floor(rand() * 3)) {
-    const y = Math.round(ridge(x) - 4 - rand() * 4);
-    if (y >= 0 && y < THUMB.h) idx[y * THUMB.w + x] = levels - 2;
-  }
-  return idx;
-}
-
+// Title bar with a numbered badge, the project's UI screenshot edge to edge, then a one-line description and tag.
 export async function projectSvg(config, mode, data, index) {
   const theme = config.theme[mode];
-  const repo = data.featured[index];
+  const entry = config.github.featuredRepos[index];
+  const repo = data.featured.find((r) => r.name.toLowerCase() === entry.repo.toLowerCase()) ?? { name: entry.repo, url: `https://github.com/${config.github.username}/${entry.repo}` };
   const t = textKit();
   const w = 440;
-  const pad = 20;
-  const artW = THUMB.w * PX;
-  const artH = THUMB.h * PX;
-  const artY = BAR + pad;
-  const nameY = artY + artH + 48;
-  const desc = wrapWidth(repo.description || 'No description yet.', w - pad * 2, measurer('sans', 15), 2);
-  const metaY = nameY + 26 + 2 * 22 + 8;
-  const actionY = metaY + 64;
-  const h = actionY + 64;
-  const label = repo.homepage ? 'VISIT PROJECT' : 'VIEW SOURCE';
-  const btnW = Math.ceil(measurer('monoBold', 13, 2)(label)) + 40;
-  const art = await indexedPng(previewIndices(theme, repo, mode), THUMB.w, THUMB.h, theme.ramp.map((c) => hexToRgba(c)));
-  const metaW = w / 3;
+  const pad = 18;
+  const shotH = 248;
+  const footY = BAR + shotH;
+  const h = footY + 52;
+  const shot = `data:image/jpeg;base64,${(await readFile(new URL(entry.shot, root))).toString('base64')}`;
+  const title = entry.title || repo.name;
+  const num = String(index + 1).padStart(2, '0');
+  const titleX = pad + 34;
+  const titleW = measurer('monoBold', 14)(title);
+  const where = truncate(host(repo.homepage || repo.url), w - titleX - titleW - pad - 24, measurer('mono', 12));
+  const tag = entry.tag || '';
+  const tagW = tag ? measurer('mono', 12)(tag) + 20 : 0;
+  const desc = truncate(entry.description || repo.description || '', w - pad * 2 - tagW, measurer('mono', 13));
 
   const body = [
     frame(theme, w, h),
-    titleBar(theme, t, w, repo.name, repo.updated ? `updated ${repo.updated}` : ''),
-    pxImage(art, artW, artH, `x="${pad}" y="${artY}"`),
-    `<rect x="${pad + 0.5}" y="${artY + 0.5}" width="${artW - 1}" height="${artH - 1}" fill="none" stroke="${theme.line}"/>`,
-    t('sansBold', truncate(repo.name, w - pad * 2, measurer('sansBold', 30)), { x: pad, y: nameY, size: 30, fill: theme.text1, spacing: -0.6 }),
-    ...desc.map((line, i) => t('sans', line, { x: pad, y: nameY + 30 + i * 22, size: 15, fill: theme.text2 })),
-    hline(theme, 0, w, metaY),
-    vline(theme, metaW, metaY, actionY),
-    vline(theme, metaW * 2, metaY, actionY),
-    cell(theme, t, 'language', repo.language || '—', pad, metaY + 24),
-    cell(theme, t, 'stars', fmt(repo.stars), metaW + pad, metaY + 24),
-    cell(theme, t, 'updated', repo.updated || '—', metaW * 2 + pad, metaY + 24),
-    hline(theme, 0, w, actionY),
-    `<rect x="${w - pad - btnW}" y="${actionY + 12}" width="${btnW}" height="40" fill="${theme.accent}"/>`,
-    t('monoBold', label, { x: w - pad - btnW / 2, y: actionY + 37, size: 13, fill: theme.onAccent, anchor: 'middle', spacing: 2 }),
+    `<rect x="${pad}" y="15" width="24" height="18" fill="${theme.accent}"/>`,
+    t('monoBold', num, { x: pad + 12, y: 28.5, size: 11, fill: theme.onAccent, anchor: 'middle' }),
+    t('monoBold', title, { x: titleX, y: 30, size: 14, fill: theme.text1 }),
+    t('mono', where, { x: w - pad, y: 30, size: 12, fill: theme.text3, anchor: 'end' }),
+    hline(theme, 0, w, BAR - 1),
+    `<image x="1" y="${BAR}" width="${w - 2}" height="${shotH}" preserveAspectRatio="xMidYMid slice" href="${shot}"/>`,
+    hline(theme, 0, w, footY),
+    t('mono', desc, { x: pad, y: footY + 31, size: 13, fill: theme.text2 }),
+    tag ? t('mono', tag, { x: w - pad, y: footY + 31, size: 12, fill: theme.text3, anchor: 'end' }) : '',
   ].join('\n');
-  return svgDoc({ w, h, title: `${repo.name}: ${repo.description || 'project'}`, style: await t.style(), body });
+  return svgDoc({ w, h, title: `${title}: ${entry.description || repo.description || 'project'}`, style: await t.style(), body });
 }
 
 // A small five-point star path centred on (x, y).

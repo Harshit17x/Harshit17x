@@ -2,8 +2,10 @@
   "github": {
     "username": "Harshit17x",
     "featuredRepos": [
-      { "repo": "Diskatlas" },
-      { "repo": "Nitro-Drift", "description": "" }
+      { "repo": "harshit-owc26", "title": "portfolio", "shot": "assets/shots/portfolio.jpg", "tag": "web", "description": "my portfolio, a garden of files" },
+      { "repo": "Slop-Drift", "title": "slop drift", "shot": "assets/shots/slop.jpg", "tag": "web game", "description": "drift a rally hatch up mussoorie" },
+      { "repo": "Mafiaaaaaakhelo", "title": "mafia khelo", "shot": "assets/shots/mafia.jpg", "tag": "multiplayer", "description": "midnight city mafia, 5-16 players" },
+      { "repo": "Saanjh", "title": "saanjh", "shot": "assets/shots/saanjh.jpg", "tag": "web app", "description": "shared medicine care for elders" }
     ],
     "moreRepos": []
   },

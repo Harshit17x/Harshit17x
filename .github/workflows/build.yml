@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['profile.config.json', 'scripts/**', 'package.json', 'package-lock.json']
+    paths: ['profile.config.json', 'assets/**', 'scripts/**', 'package.json', 'package-lock.json']
 
 permissions:
   contents: write

@@ -60,6 +60,6 @@ test('config validation names every missing or malformed field', () => {
       stack: { tools: [] },
       theme: { dark: theme, light: theme },
     }),
-    /theme\.dark\.text3 must be a #rrggbb colour[\s\S]*accentSteps[\s\S]*featuredRepos must list exactly 2[\s\S]*links\[0\]\.url[\s\S]*stack\["tools"\]/,
+    /theme\.dark\.text3 must be a #rrggbb colour[\s\S]*accentSteps[\s\S]*featuredRepos must list 1 to 6[\s\S]*links\[0\]\.url[\s\S]*stack\["tools"\]/,
   );
 });

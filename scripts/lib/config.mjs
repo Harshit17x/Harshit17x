@@ -43,8 +43,8 @@ export function validateConfig(config) {
   }
 
   const featured = config.github?.featuredRepos;
-  if (Array.isArray(featured) && featured.length && (featured.length !== 2 || !featured.every((f) => f?.repo))) {
-    errors.push('github.featuredRepos must list exactly 2 entries, each with a "repo" name');
+  if (Array.isArray(featured) && featured.length && (featured.length > 6 || !featured.every((f) => f?.repo && f?.shot))) {
+    errors.push('github.featuredRepos must list 1 to 6 entries, each with a "repo" name and a "shot" image path');
   }
   const more = config.github?.moreRepos;
   if (more != null && (!Array.isArray(more) || more.length > 5 || !more.every((r) => typeof r === 'string'))) {

@@ -1,9 +1,6 @@
 // GitHub data for the signal and project cards. Falls back to data/cache.json when offline or without a token.
 import { execFileSync } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import sharp from 'sharp';
-
-export const THUMB = { w: 100, h: 40 }; // project thumbnails, in dither cells
 
 const QUERY = `query($login: String!) {
   user(login: $login) {
@@ -12,7 +9,7 @@ const QUERY = `query($login: String!) {
                  orderBy: { field: STARGAZERS, direction: DESC }) {
       totalCount
       nodes {
-        name description url homepageUrl pushedAt stargazerCount openGraphImageUrl usesCustomOpenGraphImage
+        name description url homepageUrl pushedAt stargazerCount
         primaryLanguage { name }
         languages(first: 10, orderBy: { field: SIZE, direction: DESC }) { edges { size node { name } } }
       }
@@ -48,22 +45,6 @@ async function graphql(tok, variables) {
   return json.data.user;
 }
 
-// Downscaled grayscale bytes of a repo's social preview image, base64. Null if it can't be fetched.
-async function thumbnail(url) {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const raw = await sharp(Buffer.from(await res.arrayBuffer()))
-      .resize(THUMB.w, THUMB.h, { fit: 'cover' })
-      .grayscale()
-      .raw()
-      .toBuffer();
-    return raw.toString('base64');
-  } catch {
-    return null;
-  }
-}
-
 const shortDate = (iso) => (iso ? new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }) : '');
 
 export async function summarise(user, featuredConfig, moreConfig = []) {
@@ -96,8 +77,6 @@ export async function summarise(user, featuredConfig, moreConfig = []) {
       ...brief(repo, f.description),
       homepage: repo.homepageUrl || '',
       updated: shortDate(repo.pushedAt),
-      // GitHub's auto-generated card is mostly text and turns to mush when dithered; only use custom previews.
-      thumb: repo.usesCustomOpenGraphImage ? await thumbnail(repo.openGraphImageUrl) : null,
     });
   }
 

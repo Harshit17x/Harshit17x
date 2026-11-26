@@ -3,6 +3,7 @@ import { loadConfig } from './lib/config.mjs';
 import { loadGithubData } from './lib/github.mjs';
 import { renderReadme } from './lib/readme.mjs';
 import { headerSvg } from './lib/cards/header.mjs';
+import { projectSvg } from './lib/cards/repos.mjs';
 
 const root = new URL('../', import.meta.url);
 const config = await loadConfig(new URL('profile.config.json', root));
@@ -14,6 +15,13 @@ const { profile } = config;
 const layout = [
   [{ name: 'header', alt: `${profile.name}: ${profile.intro}`, href: `https://github.com/${config.github.username}`, render: (c, m) => headerSvg(c, m, data) }],
 ];
+// Project cards, two per line.
+const projects = config.github.featuredRepos.map((entry, i) => {
+  const repo = data.featured.find((r) => r.name.toLowerCase() === entry.repo.toLowerCase());
+  const href = repo?.homepage || repo?.url || `https://github.com/${config.github.username}/${entry.repo}`;
+  return { name: `project-${i + 1}`, alt: `${entry.title || entry.repo}: ${entry.description || ''}`, href, render: (c, m) => projectSvg(c, m, data, i) };
+});
+for (let i = 0; i < projects.length; i += 2) layout.push(projects.slice(i, i + 2));
 
 const rows = [];
 const written = [];
