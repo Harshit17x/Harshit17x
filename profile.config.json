@@ -1,0 +1,62 @@
+{
+  "github": {
+    "username": "Harshit17x",
+    "featuredRepos": [
+      { "repo": "Diskatlas" },
+      { "repo": "Nitro-Drift", "description": "" }
+    ]
+  },
+  "profile": {
+    "name": "harshit",
+    "role": "developer",
+    "status": "building",
+    "taglines": [
+      "building small, strange, useful software",
+      "currently: pixels, dithering and the web",
+      "open to interesting problems"
+    ],
+    "motto": ["stay", "curious"],
+    "intro": [
+      "I build local-first tools and small games.",
+      "Lately: pixels, dithering and quiet, fast software."
+    ],
+    "now": {
+      "now": "shipping Diskatlas",
+      "building": "tools and games",
+      "learning": "graphics and shaders",
+      "based in": "earth, mostly"
+    },
+    "signoff": "see you around"
+  },
+  "links": [
+    { "label": "github", "url": "https://github.com/Harshit17x" },
+    { "label": "repos", "url": "https://github.com/Harshit17x?tab=repositories" },
+    { "label": "email", "url": "mailto:you@example.com" },
+    { "label": "website", "url": "https://example.com" }
+  ],
+  "stack": [
+    { "label": "TypeScript", "mono": "TS" },
+    { "label": "JavaScript", "mono": "JS" },
+    { "label": "C#", "mono": "C#" },
+    { "label": "HTML", "mono": "HT" },
+    { "label": "CSS", "mono": "CS" },
+    { "label": "Git", "mono": "GT" }
+  ],
+  "theme": {
+    "dark": {
+      "bg": "#0b0a07", "ink": "#f6ecc9", "dim": "#9a8a5c", "accent": "#ffd400",
+      "ramp": ["#0b0a07", "#1d180b", "#3a2f0d", "#6e5a06", "#b08e00", "#e6bb00", "#ffd400", "#fff0a0"]
+    },
+    "light": {
+      "bg": "#f5f1e6", "ink": "#2a2208", "dim": "#7d6f45", "accent": "#a88400",
+      "ramp": ["#f5f1e6", "#efe5c2", "#e5d38e", "#d9bd52", "#c49f12", "#9a7b00", "#6b5500", "#3a2e00"]
+    }
+  },
+  "effects": {
+    "seed": 7
+  },
+  "motion": {
+    "driftSeconds": 90,
+    "scanSeconds": 8
+  }
+}

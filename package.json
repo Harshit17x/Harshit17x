@@ -1,0 +1,22 @@
+{
+  "name": "dither-sky-profile",
+  "private": true,
+  "type": "module",
+  "description": "Generated pixel-dither GitHub profile README",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "dependencies": {
+    "@fontsource/doto": "^5.3.0",
+    "@fontsource/silkscreen": "^5.3.0",
+    "@fontsource/vt323": "^5.3.0",
+    "fast-xml-parser": "^5.12.1",
+    "sharp": "^0.35.5",
+    "subset-font": "^2.9.0"
+  }
+}
