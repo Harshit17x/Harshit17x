@@ -31,15 +31,15 @@
     "dark": {
       "page": "#111111", "panel": "#161616", "well": "#202020", "line": "#2c2c2c",
       "text1": "#f2f2f2", "text2": "#bdbdbd", "text3": "#8a8a8a",
-      "accent": "#ff7a2f", "onAccent": "#140a04",
-      "ramp": ["#161616", "#1d1d1d", "#262626", "#333333", "#444444", "#585858", "#7a3412", "#b44d18", "#ff7a2f", "#ffb07a"],
+      "accent": "#3b9eff", "onAccent": "#03101d",
+      "ramp": ["#161616", "#1a1f26", "#202833", "#2a3644", "#364657", "#4a5d73", "#0e3a6e", "#1661b8", "#3b9eff", "#a8d4ff"],
       "accentSteps": 4
     },
     "light": {
       "page": "#f4f4f2", "panel": "#ffffff", "well": "#efefec", "line": "#dcdcd7",
       "text1": "#161616", "text2": "#444444", "text3": "#767676",
-      "accent": "#e2621a", "onAccent": "#ffffff",
-      "ramp": ["#ffffff", "#f2f2ef", "#e6e6e2", "#d6d6d1", "#c2c2bc", "#aaaaa3", "#f6c3a0", "#ef9a63", "#e2621a", "#b84a0e"],
+      "accent": "#1f6fd1", "onAccent": "#ffffff",
+      "ramp": ["#ffffff", "#f1f3f6", "#e4e8ee", "#d3d9e2", "#bcc5d1", "#a2adbc", "#bcdcff", "#7cb8ff", "#2f86e8", "#1a5fb4"],
       "accentSteps": 4
     }
   },

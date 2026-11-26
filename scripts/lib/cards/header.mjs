@@ -1,35 +1,55 @@
-// Header: title bar, a drifting dithered band (grey haze with an ember core, fading into the panel),
+// Header: title bar, a drifting band of LED dots (streaks falling onto a bright horizon, fading to dark),
 // then the name and intro beside a 2×2 grid of stats.
 import { bayerLevels } from '../dither.mjs';
 import { fbm, smoothstep } from '../noise.mjs';
-import { indexedPng, hexToRgba } from '../raster.mjs';
+import { indexedPng, hexToRgba, TRANSPARENT } from '../raster.mjs';
 import { PX, clamp01, textKit, svgDoc, frame, hline, vline, cell, BAR, measurer, truncate } from '../svg.mjs';
 
 const W = 880;
-const BAND_H = 272;
-const INFO_H = 168;
+const BAND_H = 168;
+const INFO_H = 196;
 const H = BAR + BAND_H + INFO_H;
 const CW = W / PX;
 const CH = BAND_H / PX;
 
 function bandIndices(seed, levels) {
   const values = new Float32Array(CW * CH);
-  const haze = { tileWidth: CW, features: 6, octaves: 5, seed };
-  const core = { tileWidth: CW, features: 10, octaves: 4, seed: seed + 3 };
+  const rain = { tileWidth: CW, features: 44, octaves: 3, seed };
+  const breaks = { tileWidth: CW, features: 14, octaves: 3, seed: seed + 3 };
   for (let y = 0; y < CH; y++) {
     const t = y / (CH - 1);
     for (let x = 0; x < CW; x++) {
       const u = x / CW;
       // Whole-number wave counts keep the band seamless across the tile, so it can loop while drifting.
-      const centre = 0.52 + 0.1 * Math.sin(2 * Math.PI * (2 * u) + 0.4) + 0.05 * Math.sin(2 * Math.PI * (3 * u) + 2.1);
-      const d = t - centre;
-      // Stretching noise vertically gives long horizontal streaks.
-      const mist = Math.exp(-((d / 0.26) ** 2)) * (0.3 + 0.7 * fbm(x, y * 2.2, haze));
-      const glow = Math.exp(-((d / 0.085) ** 2)) * smoothstep(0.36, 0.66, fbm(x, y * 3, core));
-      values[y * CW + x] = clamp01(0.66 * mist + 0.6 * glow);
+      const horizon = 0.6 + 0.035 * Math.sin(2 * Math.PI * (2 * u) + 0.4) + 0.02 * Math.sin(2 * Math.PI * (5 * u) + 1.3);
+      const d = t - horizon;
+      const line = Math.exp(-((d / 0.038) ** 2)) * (0.5 + 0.5 * smoothstep(0.3, 0.7, fbm(x, y, breaks)));
+      let v;
+      if (d < 0) {
+        // Squashing y in the noise stretches it into vertical streaks that brighten toward the horizon.
+        const streak = smoothstep(0.34, 0.74, fbm(x, y * 0.1, rain));
+        const rise = 0.3 + 0.7 * clamp01(1 + d / 0.6) ** 1.6;
+        const mist = Math.exp(-((d / 0.14) ** 2));
+        v = 0.03 + 0.7 * streak * rise + 0.32 * mist + line;
+      } else {
+        v = 0.03 + line + 0.4 * Math.exp(-d / 0.08) * fbm(x, y * 0.5, rain);
+      }
+      values[y * CW + x] = clamp01(v);
     }
   }
   return bayerLevels(values, CW, CH, levels);
+}
+
+// Draw each dither cell as a 3×3 dot with a 1px gap, so the band reads as an LED matrix.
+function ledGrid(indices, gap) {
+  const out = new Uint8Array(W * BAND_H).fill(gap);
+  for (let y = 0; y < CH; y++) {
+    for (let x = 0; x < CW; x++) {
+      const i = indices[y * CW + x];
+      for (let dy = 0; dy < PX - 1; dy++) out.fill(i, (y * PX + dy) * W + x * PX, (y * PX + dy) * W + x * PX + PX - 1);
+    }
+  }
+  return out;
 }
 
 export async function headerSvg(config, mode, data) {
@@ -40,7 +60,8 @@ export async function headerSvg(config, mode, data) {
   const seconds = config.motion?.bandSeconds ?? 120;
   const t = textKit();
 
-  const band = await indexedPng(bandIndices(seed, theme.ramp.length), CW, CH, theme.ramp.map((c) => hexToRgba(c)));
+  const palette = [...theme.ramp.map((c) => hexToRgba(c)), TRANSPARENT];
+  const band = await indexedPng(ledGrid(bandIndices(seed, theme.ramp.length), palette.length - 1), W, BAND_H, palette);
   const top = BAR + BAND_H;
   const gridX = 560;
   const colW = (W - gridX) / 2;
@@ -67,17 +88,17 @@ export async function headerSvg(config, mode, data) {
     `<g clip-path="url(#bandclip)"><g class="drift"><use href="#band"/><use href="#band" x="${W}"/></g></g>`,
     hline(theme, 0, W, top),
     // Name and intro.
-    t('sansBold', name, { x: 32, y: top + 62, size: 52, fill: theme.text1, spacing: -1.5 }),
-    t('sans', truncate(intro, gridX - 64, measurer('sans', 16)), { x: 34, y: top + 92, size: 16, fill: theme.text2 }),
-    t('mono', 'NOW', { x: 34, y: top + 128, size: 11, fill: theme.text3, spacing: 1.2 }),
-    t('monoBold', truncate(now, gridX - 140, measurer('monoBold', 13)), { x: 110, y: top + 128, size: 13, fill: theme.text1 }),
-    t('mono', 'HANDLE', { x: 34, y: top + 150, size: 11, fill: theme.text3, spacing: 1.2 }),
-    t('monoBold', `@${username}`, { x: 110, y: top + 150, size: 13, fill: theme.text1 }),
+    t('sans', name, { x: 30, y: top + 84, size: 64, fill: theme.text1, spacing: -2.5 }),
+    t('mono', truncate(intro, gridX - 68, measurer('mono', 15)), { x: 34, y: top + 118, size: 15, fill: theme.text2 }),
+    t('mono', 'NOW', { x: 34, y: top + 158, size: 11, fill: theme.text3, spacing: 1.2 }),
+    t('monoBold', truncate(now, gridX - 150, measurer('monoBold', 14)), { x: 120, y: top + 158, size: 14, fill: theme.text1 }),
+    t('mono', 'HANDLE', { x: 34, y: top + 182, size: 11, fill: theme.text3, spacing: 1.2 }),
+    t('monoBold', `@${username}`, { x: 120, y: top + 182, size: 14, fill: theme.text1 }),
     // Stats grid.
     vline(theme, gridX, top, H),
     vline(theme, gridX + colW, top, H),
     hline(theme, gridX, W, top + rowH),
-    ...stats.map(([label, value], i) => cell(theme, t, label, value, gridX + (i % 2) * colW + 20, top + Math.floor(i / 2) * rowH + 30)),
+    ...stats.map(([label, value], i) => cell(theme, t, label, value, gridX + (i % 2) * colW + 20, top + Math.floor(i / 2) * rowH + 40)),
   ].join('\n');
 
   const style = `${await t.style()}
@@ -86,6 +107,6 @@ export async function headerSvg(config, mode, data) {
 .m1{animation:blink 1.6s steps(1,end) infinite}
 .m2{animation:blink 1.6s steps(1,end) infinite -.8s}
 @keyframes blink{50%{opacity:.25}}`;
-  const defs = `<image id="band" class="px" image-rendering="optimizeSpeed" width="${W}" height="${BAND_H}" y="${BAR}" href="${band}"/><clipPath id="bandclip"><rect x="1" y="${BAR + 1}" width="${W - 2}" height="${BAND_H - 1}"/></clipPath>`;
+  const defs = `<image id="band" width="${W}" height="${BAND_H}" y="${BAR}" href="${band}"/><clipPath id="bandclip"><rect x="1" y="${BAR + 1}" width="${W - 2}" height="${BAND_H - 1}"/></clipPath>`;
   return svgDoc({ w: W, h: H, title: `${name}. ${intro}`, style, defs, body });
 }
