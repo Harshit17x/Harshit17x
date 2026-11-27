@@ -1,7 +1,7 @@
 {
  "totals": {
   "followers": 6,
-  "contributions": 393,
+  "contributions": 407,
   "repos": 18,
   "stars": 4
  },
@@ -479,31 +479,31 @@
    5,
    7,
    12,
-   19,
-   null,
+   21,
+   12,
    null
   ]
  ],
  "languages": [
   {
    "name": "HTML",
-   "share": 0.44061262762603465
-  },
-  {
-   "name": "C#",
-   "share": 0.1704591788617374
-  },
-  {
-   "name": "TypeScript",
-   "share": 0.15351828445991875
+   "share": 0.4198887180894251
   },
   {
    "name": "JavaScript",
-   "share": 0.15265576311951745
+   "share": 0.17141475070000287
+  },
+  {
+   "name": "C#",
+   "share": 0.16241958095950723
+  },
+  {
+   "name": "TypeScript",
+   "share": 0.14888861022062494
   },
   {
    "name": "Python",
-   "share": 0.042346842980192506
+   "share": 0.04842829803674466
   }
  ],
  "featured": [
@@ -523,7 +523,7 @@
    "stars": 0,
    "language": "JavaScript",
    "homepage": "https://slop-drift.vercel.app",
-   "updated": "Nov 26"
+   "updated": "Nov 27"
   },
   {
    "name": "Mafiaaaaaakhelo",
@@ -550,7 +550,7 @@
    "description": "Local-first,  disk space analyzer and developer storage cleaner for macOS, Windows, and Linux. ",
    "url": "https://github.com/Harshit17x/Diskatlas",
    "stars": 2,
-   "language": "TypeScript"
+   "language": "Rust"
   },
   {
    "name": "Nitro-Drift",
